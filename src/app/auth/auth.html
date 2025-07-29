@@ -1,0 +1,133 @@
+<!-- <div class="full-page">
+
+  <div class="left-section">
+    <div class="branding">
+      <h1>AI Interview Platform</h1>
+      <p>Transforming the way companies hire, one smart question at a time.</p>
+      <img src="assets/ai-avatar.svg" alt="AI Interview" />
+    </div>
+  </div>
+
+
+  <div class="right-section">
+    <mat-card class="auth-card">
+      <h2><mat-icon>login</mat-icon> Login Portal</h2>
+
+      <mat-button-toggle-group [(ngModel)]="role" class="role-toggle" appearance="legacy">
+        <mat-button-toggle value="HR">
+          <mat-icon>business</mat-icon>&nbsp;HR
+        </mat-button-toggle>
+        <mat-button-toggle value="CANDIDATE">
+          <mat-icon>person</mat-icon>&nbsp;Candidate
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent" style="margin-bottom: 16px;"></mat-progress-bar>
+
+   
+      <div class="form-section" *ngIf="role === 'HR'">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" required />
+          <mat-icon matPrefix>mail</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" [(ngModel)]="password" required />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="login()">Login as HR</button>
+      </div>
+
+      
+      <div class="form-section" *ngIf="role === 'CANDIDATE'">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" required />
+          <mat-icon matPrefix>mail</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="login()">Send OTP</button>
+
+        <div *ngIf="showOtp" class="otp-section">
+          <mat-form-field appearance="outline">
+            <mat-label>Enter OTP</mat-label>
+            <input matInput type="text" [(ngModel)]="otp" required />
+            <mat-icon matPrefix>vpn_key</mat-icon>
+          </mat-form-field>
+
+          <button mat-raised-button color="accent" (click)="verifyOtp()">Verify OTP</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div> -->
+<div class="full-page">
+  <!-- LEFT: Branding Section -->
+  <div class="left-section">
+    <div class="branding">
+      <img src="ai-avatar.png" alt="AI Interview" class="branding-image" />
+      <h1>Welcome to <span class="brand-highlight">IntelliView AI</span></h1>
+      <p class="tagline">Revolutionizing recruitment with intelligent interviews.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: Auth Section -->
+  <div class="right-section">
+    <mat-card class="auth-card animate-slide-in">
+      <h2><mat-icon color="accent">login</mat-icon> Login Portal</h2>
+
+      <!-- Role Selection -->
+      <mat-button-toggle-group [(ngModel)]="role" class="role-toggle" appearance="legacy">
+        <mat-button-toggle value="HR">
+          <mat-icon>business</mat-icon>&nbsp;HR
+        </mat-button-toggle>
+        <mat-button-toggle value="CANDIDATE">
+          <mat-icon>person</mat-icon>&nbsp;Candidate
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-progress-bar *ngIf="loading" mode="indeterminate" color="accent" style="margin: 16px 0;"></mat-progress-bar>
+
+      <!-- HR Login Form -->
+      <div class="form-section" *ngIf="role === 'HR'">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" required />
+          <mat-icon matPrefix>mail</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" [(ngModel)]="password" required />
+          <mat-icon matPrefix>lock</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="login()">Login as HR</button>
+      </div>
+
+      <!-- Candidate OTP Login -->
+      <div class="form-section" *ngIf="role === 'CANDIDATE'">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="email" required />
+          <mat-icon matPrefix>mail</mat-icon>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="login()">Send OTP</button>
+
+        <div *ngIf="showOtp" class="otp-section">
+          <mat-form-field appearance="outline">
+            <mat-label>Enter OTP</mat-label>
+            <input matInput type="text" [(ngModel)]="otp" required />
+            <mat-icon matPrefix>vpn_key</mat-icon>
+          </mat-form-field>
+
+          <button mat-raised-button color="accent" (click)="verifyOtp()">Verify OTP</button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

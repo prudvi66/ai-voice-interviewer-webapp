@@ -1,0 +1,69 @@
+<div class="resume-upload-wrapper">
+  <mat-card class="resume-card">
+    <button mat-icon-button class="floating-back-btn" matTooltip="Go Back" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <h2 class="page-title">Upload Candidate Resume</h2>
+
+    <div class="upload-section">
+      <button mat-flat-button color="primary" class="upload-btn" (click)="fileInput.click()">
+        <mat-icon>upload_file</mat-icon>
+        Select Resume
+      </button>
+      <input
+        type="file"
+        accept=".pdf,.doc,.docx"
+        #fileInput
+        hidden
+        (change)="onFileSelected($event)"
+      />
+
+      <div *ngIf="resumeFile" class="file-preview">
+        <mat-icon>description</mat-icon>
+        <span>{{ resumeFile.name }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="extractedFields" class="fields-form">
+      <h3 class="form-header">Extracted Candidate Details</h3>
+
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="extractedFields.name" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput [(ngModel)]="extractedFields.email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput [(ngModel)]="extractedFields.phoneNumber" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Experience</mat-label>
+          <input matInput [(ngModel)]="extractedFields.experience" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Skills</mat-label>
+          <input matInput [(ngModel)]="extractedFields.techStack" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Role</mat-label>
+          <input matInput [(ngModel)]="extractedFields.designation" />
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="accent" class="save-btn" (click)="registerCandidate()">
+        <mat-icon>save</mat-icon>
+        Save Candidate
+      </button>
+    </div>
+  </mat-card>
+</div>

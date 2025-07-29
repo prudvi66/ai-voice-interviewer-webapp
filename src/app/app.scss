@@ -1,0 +1,36 @@
+.main-toolbar {
+  background: linear-gradient(to right, #1e3c72, #2a5298); 
+  color: #fff;
+  height: 64px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  overflow-x: hidden;
+
+  .toolbar-title {
+    display: flex;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    gap: 10px;
+
+    .app-icon {
+      font-size: 28px;
+      color: #ffc107; 
+    }
+  }
+}
+
+.content-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  height: calc(100vh - 64px); // subtract toolbar height
+  background: #eef3f9; // light background
+}
+
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden; // 🔐 Prevent scroll
+}

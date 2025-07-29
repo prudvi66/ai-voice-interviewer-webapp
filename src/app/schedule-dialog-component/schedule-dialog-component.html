@@ -1,0 +1,46 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div class="avatar">
+      <mat-icon>person</mat-icon>
+    </div>
+    <div class="candidate-info">
+      <h2>Schedule Interview</h2>
+      <div class="candidate-name">{{ data.candidate.name }}</div>
+      <div class="candidate-email">{{ data.candidate.email }}</div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-dialog-content class="dialog-content">
+    <mat-form-field appearance="outline" class="dialog-field">
+      <mat-label>Interview Round</mat-label>
+      <mat-select [(ngModel)]="selectedRound">
+        <mat-option *ngFor="let round of data.masterRounds" [value]="round">{{ round }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="dialog-field">
+  <mat-label>Date</mat-label>
+  <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate">
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="dialog-field">
+  <mat-label>Time</mat-label>
+  <mat-select [(ngModel)]="selectedTime">
+    <mat-option *ngFor="let time of timeSlots" [value]="time">{{ time }}</mat-option>
+  </mat-select>
+</mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button class="cancel-btn" (click)="onCancel()">Cancel</button>
+    <button mat-raised-button color="primary" class="schedule-btn" (click)="onSchedule()">Schedule</button>
+  </mat-dialog-actions>
+
+  <div class="spinner-overlay" *ngIf="loading">
+  <mat-spinner diameter="48" color="primary"></mat-spinner>
+</div>
+</div>
