@@ -1,141 +1,136 @@
-<div class="interview-container">
-  <div class="loading-screen" *ngIf="isLoadingSession">
-    <mat-spinner color="primary" [diameter]="60"></mat-spinner>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>AI Interview</title>
+</head>
+<body>
+  <div class="loading-screen" *ngIf="isLoadingSession" role="alert" aria-live="polite">
+    <mat-spinner aria-label="Loading interview session"></mat-spinner>
     <h1 class="loading-title">Starting Your Interview...</h1>
     <p>Please wait while we set things up.</p>
   </div>
 
-  <div class="interview-main">
-    <mat-card class="side-panel animated-panel">
+ <div class="interview-main animated-panel" [hidden]="isLoadingSession" role="main">
+    <div class="ai-panel" role="region" aria-label="AI Interviewer Panel">
+      <div class="ai-voice-section">
+        <h3><mat-icon>record_voice_over</mat-icon> AI Interviewer Voice</h3>
+        <div class="ai-interviewer-video-container">
+          <video class="ai-interviewer-video" autoplay loop muted playsinline [ngClass]="{'speaking': isAiSpeaking}" aria-label="Animated AI interviewer">
+            <source src="assets/ai-interviewer.webm" type="video/webm">
+            <img src="assets/ai-interviewer-fallback.jpg" alt="AI interviewer fallback image">
+          </video>
+          <div class="ai-speaking-overlay" [ngClass]="{'show': isAiSpeaking}" aria-hidden="true">
+            <mat-icon>graphic_eq</mat-icon> AI is speaking...
+          </div>
+        </div>
+        <p class="current-ai-question" [innerHTML]="currentQuestion.questionName"></p>
+      </div>
+
+      <div class="ai-chat-history-full">
+        <h4><mat-icon>chat_bubble_outline</mat-icon> AI Conversation History</h4>
+        <div class="chat-messages" role="log" aria-live="polite">
+          <div *ngFor="let chat of fullChatHistory" class="chat-message" [ngClass]="{'ai-message': chat.sender === 'ai', 'user-message': chat.sender === 'user'}">
+            <p><strong>{{ chat.sender === 'user' ? 'You' : 'AI' }}:</strong> {{ chat.text }}</p>
+          </div>
+          <div class="no-messages" *ngIf="fullChatHistory.length === 0">
+            No AI conversation yet.
+          </div>
+        </div>
+        <mat-form-field class="ai-chat-input">
+          <mat-label>Ask AI Assistant</mat-label>
+          <input matInput [(ngModel)]="userQuery" (keyup.enter)="askAssistant()" aria-label="Ask AI assistant">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="question-panel animated-panel" role="region" aria-label="Question Panel">
+      <div class="question-header">
+        <h2 class="question-title">{{ currentQuestion.questionName }}</h2>
+        <button mat-icon-button (click)="getHelp('general')" aria-label="Get help for current question">
+          <mat-icon>help_outline</mat-icon>
+        </button>
+      </div>
+      <mat-form-field appearance="outline" class="answer-field">
+        <mat-label>Your Answer</mat-label>
+        <textarea matInput [(ngModel)]="currentLiveTranscript" placeholder="Speak or type your response..." aria-label="Enter or speak your answer"></textarea>
+        <mat-icon matSuffix class="listening-indicator" *ngIf="isListening">mic</mat-icon>
+        <mat-hint *ngIf="isListening">Listening for your response...</mat-hint>
+      </mat-form-field>
+    
+      <div class="nudge-message" *ngIf="motivationalNudge">
+        <mat-icon>sentiment_satisfied_alt</mat-icon> {{ motivationalNudge }}
+      </div>
+      <div class="realtime-feedback">
+        <h4><mat-icon>insights</mat-icon> Real-time Feedback</h4>
+        <mat-chip-listbox aria-label="Real-time feedback metrics">
+          <mat-chip color="primary" selectable="true">{{ speakingRateFeedback }}</mat-chip>
+          <mat-chip color="accent" selectable="true">{{ fillerWordFeedback }}</mat-chip>
+        </mat-chip-listbox>
+      </div>
+    </div>
+
+    <div class="candidate-info-panel animated-panel" role="region" aria-label="Candidate Information Panel">
       <div class="profile-section">
         <div class="avatar-wrapper">
-          <img [src]="candidateAvatarUrl" alt="Candidate Avatar" class="candidate-avatar" />
-          <div class="online-indicator" [class.online]="isUserOnline"></div>
+          <img class="candidate-avatar" [src]="candidateAvatarUrl" alt="Candidate avatar">
+          <span class="online-indicator" [ngClass]="{'online': isUserOnline}" aria-hidden="true"></span>
         </div>
         <h2 class="candidate-name">{{ candidateName }}</h2>
         <p class="role-info">{{ companyName }} — {{ roundName }}</p>
       </div>
-
-      <div class="interview-stats">
-        <h3><mat-icon>timer</mat-icon> <span class="timer-display">{{ interviewTimer | date:'mm:ss' }}</span></h3>
-        <div class="progress-section">
-          <p>Overall Progress: {{ currentQuestionIndex + 1 }} / {{ allQuestions.length }}</p>
-          <mat-progress-bar mode="determinate" [value]="(currentQuestionIndex + 1) / allQuestions.length * 100"></mat-progress-bar>
-        </div>
-      </div>
-
-     
-
-      <div class="chat-preview">
-        <h4><mat-icon>chat_bubble_outline</mat-icon> AI Conversation</h4>
-        <div class="latest-message" *ngIf="assistantMessages.length > 0">
-          <p>{{ assistantMessages[assistantMessages.length - 1] }}</p>
-        </div>
-        <button mat-button color="primary" (click)="openChatHistory()">View Full Chat</button>
-      </div>
-    </mat-card>
-
-    <mat-card class="question-panel animated-panel" *ngIf="currentQuestion">
-      <div class="question-header">
-        <h2 class="question-title">{{ currentQuestion.questionName }}</h2>
-        <button mat-icon-button [matMenuTriggerFor]="helpMenu" aria-label="Help Options" class="help-button">
-          <mat-icon>help_outline</mat-icon>
-        </button>
-        <mat-menu #helpMenu="matMenu">
-          <button mat-menu-item (click)="getHelp('repeat')"><mat-icon>replay</mat-icon> Repeat Question</button>
-          <button mat-menu-item (click)="getHelp('tip')"><mat-icon>lightbulb</mat-icon> Get a Tip</button>
-          <button mat-menu-item (click)="getHelp('meaning')"><mat-icon>info</mat-icon> Explain Meaning</button>
-          <mat-divider></mat-divider>
-          <button mat-menu-item (click)="openAiAssistantChat()"><mat-icon>robot</mat-icon> General AI Help</button>
-        </mat-menu>
-      </div>
-
-      <mat-form-field appearance="outline" class="answer-field" subscriptSizing="dynamic">
-        <mat-label>Your Answer (Live Transcript)</mat-label>
-        <textarea matInput readonly [value]="answers[currentQuestionId] || 'Speak to start answering...'"></textarea>
-        <mat-icon matSuffix *ngIf="isListening" class="listening-indicator">mic</mat-icon>
-        <mat-hint *ngIf="isAnswering">Listening for your response...</mat-hint>
-        <mat-hint *ngIf="!isAnswering && !answers[currentQuestionId]">Begin speaking when ready.</mat-hint>
-      </mat-form-field>
-
-      <div class="action-buttons">
-        <button mat-flat-button color="primary" (click)="submitAnswer(currentQuestionId)">
-          <mat-icon>check_circle</mat-icon> Submit & Next
-        </button>
-        <button mat-stroked-button color="accent" (click)="skipQuestion(currentQuestionId)">
-          <mat-icon>skip_next</mat-icon> Skip Question
-        </button>
-        <button mat-stroked-button color="basic" (click)="clearCurrentAnswer()">
-          <mat-icon>clear</mat-icon> Clear Answer
-        </button>
-      </div>
-
-      <div *ngIf="motivationalNudge" class="nudge-message animated-fade-in">
-        <mat-icon>sentiment_satisfied_alt</mat-icon> {{ motivationalNudge }}
-      </div>
-
-      <div class="realtime-feedback" *ngIf="showRealtimeFeedback">
-        <h4><mat-icon>insights</mat-icon> Real-time Feedback</h4>
-        <mat-chip-listbox>
-          <mat-chip color="primary" selected *ngIf="speakingRateFeedback">
-            <mat-icon>speed</mat-icon> Speed: {{ speakingRateFeedback }}
-          </mat-chip>
-          <mat-chip color="accent" selected *ngIf="fillerWordFeedback">
-            <mat-icon>chat</mat-icon> Filler Words: {{ fillerWordFeedback }}
-          </mat-chip>
-        </mat-chip-listbox>
-      </div>
-    </mat-card>
-
-    <mat-card class="media-panel animated-panel">
       <div class="video-container">
-        <video #candidateVideo class="video-preview" autoplay playsinline muted></video>
-        <div class="gaze-overlay" *ngIf="showGazeOverlay && !gazeWarnings">
+        <video class="video-preview" #videoPlayer autoplay playsinline aria-label="Candidate video feed"></video>
+        <canvas #hiddenCanvas style="display: none;"></canvas>
+        <div class="gaze-overlay" [ngClass]="{'show': showGazeOverlay}" aria-hidden="true">
           <mat-icon>eye_with_line</mat-icon> Focused
         </div>
       </div>
-
       <div class="media-controls">
-        <button mat-mini-fab color="primary" (click)="toggleCamera()"
-          [attr.aria-label]="cameraOn ? 'Turn camera off' : 'Turn camera on'">
-          <mat-icon>{{ cameraOn ? 'videocam_off' : 'videocam' }}</mat-icon>
+        <button mat-flat-button class="end-session-button" color="warn" (click)="endInterview()" aria-label="End interview session">
+          <mat-icon>exit_to_app</mat-icon> End Session
         </button>
-        <button (click)="toggleAudio()" [attr.aria-label]="microphoneOn ? 'Stop recording' : 'Start recording'">
-          <mat-icon>{{ microphoneOn ? 'mic_off' : 'mic' }}</mat-icon>
-        </button>
-        <button mat-mini-fab color="basic" (click)="toggleRealtimeFeedback()"
-          [attr.aria-label]="showRealtimeFeedback ? 'Hide real-time feedback' : 'Show real-time feedback'">
-          <mat-icon>{{ showRealtimeFeedback ? 'visibility_off' : 'visibility' }}</mat-icon>
-        </button>
-
-         <button mat-flat-button color="warn" class="end-session-button" (click)="endInterview()">
-        <mat-icon>exit_to_app</mat-icon> End Session
-      </button>
       </div>
-
-      <div class="warning-chips">
-        <mat-chip-listbox aria-label="Warnings">
-          <mat-chip color="warn" selected *ngIf="gazeWarnings" class="warning-chip animated-pulse">
-            <mat-icon>remove_red_eye</mat-icon> Gaze: {{ gazeWarnings }}
+      <div class="progress-section">
+        <h3><mat-icon>insights</mat-icon> Interview Progress</h3>
+        <p>Overall Progress: {{ currentQuestionIndex + 1 }} / {{ allQuestions.length }}</p>
+        <p class="timer-display"><mat-icon>timer</mat-icon> Time Elapsed: {{ interviewTimer | date:'mm:ss' }}</p>
+      </div>
+      <div class="reliability-parameters">
+        <h4><mat-icon>security</mat-icon> Reliability Metrics</h4>
+        <mat-chip-listbox aria-label="Reliability metrics">
+          <mat-chip color="warn" selectable="true" [ngClass]="{'animated-pulse': gazeWarnings > 0}">
+            <mat-icon>remove_red_eye</mat-icon> Gaze Away: {{ gazeWarnings }} times
           </mat-chip>
-          <mat-chip color="warn" selected *ngIf="tabWarnings" class="warning-chip animated-pulse">
-            <mat-icon>tab</mat-icon> Tabs: {{ tabWarnings }}
+          <mat-chip color="warn" selectable="true" [ngClass]="{'animated-pulse': tabSwitchCount > 0}">
+            <mat-icon>tab</mat-icon> Tab Switches: {{ tabWarnings }}
           </mat-chip>
-          <mat-chip color="warn" selected *ngIf="silenceWarning" class="warning-chip animated-pulse">
-            <mat-icon>volume_off</mat-icon> Silence: {{ silenceWarning }}
+          <mat-chip color="warn" selectable="true" [ngClass]="{'animated-pulse': outOfWindowFocusCount > 0}">
+            <mat-icon>call_split</mat-icon> Window Focus Lost: {{ outOfWindowFocusCount }}
+          </mat-chip>
+          <mat-chip color="accent" selectable="true" [ngClass]="{'animated-pulse': silenceWarning}">
+            <mat-icon>volume_off</mat-icon> Prolonged Silence: {{ silenceWarning }}
+          </mat-chip>
+          <mat-chip color="primary" selectable="true">
+            <mat-icon>mic_off</mat-icon> Audio Dropouts: {{ audioInputLostCount }}
+          </mat-chip>
+          <mat-chip color="primary" selectable="true">
+            <mat-icon>videocam_off</mat-icon> Video Dropouts: {{ videoInputLostCount }}
           </mat-chip>
         </mat-chip-listbox>
       </div>
-    </mat-card>
+    </div>
   </div>
 
-  <div *ngIf="showGlobalWarning" class="global-warning-overlay animated-slide-down">
+  <div class="global-warning-overlay" *ngIf="showGlobalWarning" role="alert" aria-live="assertive">
     <mat-icon class="warning-icon">error_outline</mat-icon>
     <p class="warning-text">{{ globalWarningMessage }}</p>
-    <button mat-icon-button (click)="dismissGlobalWarning()"><mat-icon>close</mat-icon></button>
+    <button mat-icon-button (click)="dismissGlobalWarning()" aria-label="Dismiss warning">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-</div>
-
-<video #videoPlayer autoplay playsinline muted></video>
-
-<canvas #hiddenCanvas style="display: none;"></canvas>
+</body>
+</html>
