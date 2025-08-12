@@ -91,7 +91,7 @@ export class ResumeUpload {
         resume: base64File
       };
 
-      this.http.post('http://localhost:8080/api/user/registerCandidateJson', requestBody)
+      this.http.post('http://localhost:8080/api/user/registerCandidate', requestBody)
         .subscribe({
           next: (res: any) => {
             if (res.successResponse) {

@@ -4,20 +4,25 @@
   height: 64px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   overflow-x: hidden;
+  display: flex; /* Add flexbox to center content */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+}
 
-  .toolbar-title {
-    display: flex;
-    align-items: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 600;
-    font-size: 30px;
-    gap: 10px;
+.toolbar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Ensure title is centered within its container */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 600;
+  font-size: 30px;
+  gap: 10px;
+  text-align: center; /* Fallback for text alignment */
+}
 
-    .app-icon {
-      font-size: 28px;
-      color: #ffc107; 
-    }
-  }
+.toolbar-title .app-icon {
+  font-size: 28px;
+  color: #ffc107; 
 }
 
 .content-wrapper {
@@ -25,12 +30,12 @@
   justify-content: center;
   align-items: center;
   padding: 24px;
-  height: calc(100vh - 64px); // subtract toolbar height
-  background: #eef3f9; // light background
+  height: calc(100vh - 64px); /* Subtract toolbar height */
+  background: #eef3f9; /* Light background */
 }
 
 :host {
   display: block;
   height: 100vh;
-  overflow: hidden; // 🔐 Prevent scroll
+  overflow: hidden; /* Prevent scroll */
 }
